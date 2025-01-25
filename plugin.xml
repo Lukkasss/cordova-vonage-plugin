@@ -1,33 +1,19 @@
-<plugin id="cordova-plugin-vonage" version="1.0.0" xmlns="http://apache.org/cordova/ns/plugins" xmlns:android="http://schemas.android.com/apk/res/android">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        id="com.example.vonage"
+        version="1.0.0">
     <name>VonagePlugin</name>
-    
-    <!-- Define o módulo JavaScript -->
+    <description>Cordova plugin to interact with Vonage Video API</description>
+    <license>Apache 2.0</license>
     <js-module src="www/VonagePlugin.js" name="VonagePlugin">
         <clobbers target="window.VonagePlugin" />
     </js-module>
-
-    <!-- Configuração para Android -->
     <platform name="android">
-	<framework src="com.opentok.android:opentok-android-sdk:2.28.3" />
-        <!-- Declaração de permissões no AndroidManifest.xml -->
-        <config-file target="AndroidManifest.xml" parent="/manifest">
-            <uses-permission android:name="android.permission.CAMERA" />
-            <uses-permission android:name="android.permission.RECORD_AUDIO" />
-            <uses-permission android:name="android.permission.INTERNET" />
-        </config-file>
-
-        <!-- Declaração de recursos necessários -->
-        <config-file target="AndroidManifest.xml" parent="/manifest">
-            <uses-feature android:name="android.hardware.camera" android:required="true" />
-            <uses-feature android:name="android.hardware.camera.autofocus" android:required="true" />
-        </config-file>
-
-        <!-- Registro da funcionalidade com a tag feature -->
-        <feature name="VonagePlugin">
-            <param name="android-package" value="com.example.vonage.VonagePlugin" />
-        </feature>
-
-        <!-- Código nativo do plugin -->
+        <framework src="com.opentok.android:opentok-android-sdk:2.25.3" />
         <source-file src="src/android/VonagePlugin.java" target-dir="src/com/example/vonage" />
+	<config-file target="res/xml/config.xml" parent="/*">
+            <feature name="VonagePlugin">
+                <param name="android-package" value="com.example.vonage.VonagePlugin" />
+            </feature>
+        </config-file>
     </platform>
 </plugin>
