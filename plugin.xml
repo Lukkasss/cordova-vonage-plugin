@@ -8,6 +8,7 @@
 
     <!-- Configuração para Android -->
     <platform name="android">
+	<framework src="com.opentok.android:opentok-android-sdk:2.28.3" />
         <!-- Declaração de permissões no AndroidManifest.xml -->
         <config-file target="AndroidManifest.xml" parent="/manifest">
             <uses-permission android:name="android.permission.CAMERA" />
@@ -27,7 +28,6 @@
         </feature>
 
         <!-- Código nativo do plugin -->
-	<framework src="com.opentok.android:opentok-android-sdk:2.28.0" />
         <source-file src="src/android/VonagePlugin.java" target-dir="src/com/example/vonage" />
     </platform>
 </plugin>
