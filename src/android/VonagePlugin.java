@@ -40,35 +40,62 @@ public class VonagePlugin extends CordovaPlugin {
                 publisher = new Publisher.Builder(cordova.getActivity()).build();
 		// Renderizar o Publisher no elemento HTML especificado
 		cordova.getActivity().runOnUiThread(() -> {
-    // Código JavaScript para localizar o elemento HTML
-    final String jsCode = "document.getElementById('" + publisherElementId + "') !== null";
+    // Código JavaScript para obter as dimensões e posição do elemento HTML
+    final String jsCode =
+        "(function() {" +
+        "   var container = document.getElementById('" + publisherElementId + "');" +
+        "   if (container) {" +
+        "       var rect = container.getBoundingClientRect();" +
+        "       return JSON.stringify({" +
+        "           left: rect.left, top: rect.top, width: rect.width, height: rect.height" +
+        "       });" +
+        "   } else {" +
+        "       return null;" +
+        "   }" +
+        "})();";
 
-    // Executar o JavaScript na WebView para verificar se o elemento existe
+    // Executar o JavaScript na WebView para obter as dimensões do contêiner
     WebView actualWebView = (WebView) webView.getEngine().getView();
     actualWebView.evaluateJavascript(jsCode, value -> {
-        if ("true".equals(value)) {
-            Log.d("VonagePlugin", "Elemento encontrado na WebView: " + publisherElementId);
+        if (value != null && !value.equals("null")) {
+            try {
+                // Parse das dimensões retornadas pelo JavaScript
+                JSONObject rect = new JSONObject(value);
+                int left = rect.getInt("left");
+                int top = rect.getInt("top");
+                int width = rect.getInt("width");
+                int height = rect.getInt("height");
 
-            // Criar um contêiner dinâmico no código nativo
-            FrameLayout publisherContainer = new FrameLayout(cordova.getActivity());
-            publisherContainer.setLayoutParams(new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-            ));
+                Log.d("VonagePlugin", "Dimensões do contêiner: left=" + left + ", top=" + top + ", width=" + width + ", height=" + height);
 
-            // Adicionar a View do Publisher ao contêiner dinâmico
-            publisherContainer.addView(publisher.getView());
+                // Criar um contêiner dinâmico no código nativo
+                FrameLayout publisherContainer = new FrameLayout(cordova.getActivity());
+                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
+                params.leftMargin = left;
+                params.topMargin = top;
 
-            // Adicionar o contêiner ao layout pai da WebView
-            FrameLayout rootLayout = (FrameLayout) cordova.getActivity().findViewById(android.R.id.content);
-            rootLayout.addView(publisherContainer);
+                // Configurar o contêiner com as dimensões e posição do elemento HTML
+                publisherContainer.setLayoutParams(params);
 
-            Log.d("VonagePlugin", "Publisher View adicionada ao container");
+                // Adicionar a View do Publisher ao contêiner dinâmico
+                publisherContainer.addView(publisher.getView(), new FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                ));
+
+                // Adicionar o contêiner ao layout pai da WebView
+                ((FrameLayout) actualWebView.getParent()).addView(publisherContainer);
+
+                Log.d("VonagePlugin", "Publisher View adicionada ao container informado");
+            } catch (JSONException e) {
+                Log.e("VonagePlugin", "Erro ao processar as dimensões do contêiner: " + e.getMessage());
+            }
         } else {
             Log.e("VonagePlugin", "Elemento não encontrado na WebView: " + publisherElementId);
         }
     });
 });
+
 
 
 
