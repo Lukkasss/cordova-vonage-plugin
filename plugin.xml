@@ -10,9 +10,9 @@
 	<framework src="com.opentok.android:opentok-android-sdk:2.25.0" />
 	<config-file target="res/xml/config.xml" parent="/*">
         	<feature name="VonagePlugin">
-            		<param name="android-package" value="com.example.vonageplugin.VonagePlugin" />
+            		<param name="android-package" value="com.example.vonage.VonagePlugin" />
         	</feature>
     	</config-file>
-        <source-file src="src/android/VonagePlugin.java" target-dir="src/com/example/vonageplugin" />
+        <source-file src="src/android/VonagePlugin.java" target-dir="src/com/example/vonage" />
     </platform>
 </plugin>
