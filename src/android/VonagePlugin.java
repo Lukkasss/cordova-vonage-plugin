@@ -1,33 +1,31 @@
-package com.example.vonagevideo;
+package com.example.vonage;
 
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
-import org.json.JSONArray;
-import org.json.JSONException;
-
-import com.opentok.OpenTok;
-import com.opentok.exception.OpenTokException;
+import com.opentok.android.Session;
+import com.opentok.android.Publisher;
+import com.opentok.android.Subscriber;
 
 public class VonagePlugin extends CordovaPlugin {
+    private Session session;
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        if (action.equals("createSession")) {
+        if (action.equals("startSession")) {
             String apiKey = args.getString(0);
-            String apiSecret = args.getString(1);
-            this.createSession(apiKey, apiSecret, callbackContext);
+            String sessionId = args.getString(1);
+            String token = args.getString(2);
+
+            this.startSession(apiKey, sessionId, token, callbackContext);
             return true;
         }
         return false;
     }
 
-    private void createSession(String apiKey, String apiSecret, CallbackContext callbackContext) {
-        try {
-            OpenTok openTok = new OpenTok(Integer.parseInt(apiKey), apiSecret);
-            String sessionId = openTok.createSession().getSessionId();
-            callbackContext.success(sessionId);
-        } catch (OpenTokException e) {
-            callbackContext.error("Error creating session: " + e.getMessage());
-        }
+    private void startSession(String apiKey, String sessionId, String token, CallbackContext callbackContext) {
+        // Inicialize a sessão da Vonage
+        session = new Session.Builder(cordova.getActivity(), apiKey, sessionId).build();
+        session.connect(token);
+        callbackContext.success("Sessão iniciada!");
     }
 }

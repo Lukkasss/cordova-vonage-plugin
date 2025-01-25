@@ -1,17 +1,20 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="com.example.createSession"
+        id="cordova-plugin-vonage"
         version="1.0.0">
     <name>VonagePlugin</name>
-    <js-module src="www/VonagePlugin.js" name="VonagePlugin">
-        <clobbers target="window.VonagePlugin" />
+    <description>Plugin para integrar a Vonage Video API</description>
+    <js-module src="www/vonage.js" name="Vonage">
+        <clobbers target="Vonage" />
     </js-module>
     <platform name="android">
-	<framework src="com.opentok.android:opentok-android-sdk:2.25.3" />
-        <source-file src="src/android/VonagePlugin.java" target-dir="src/com/example/createSession" />
-	<config-file target="res/xml/config.xml" parent="/*">
-            <feature name="VonagePlugin">
-                <param name="android-package" value="com.example.createSession.VonagePlugin" />
-            </feature>
-        </config-file>
+        <framework src="com.opentok.android:opentok-android-sdk:2.28.0" />
+        <source-file src="src/android/VonagePlugin.java" target-dir="src/com/example/vonage" />
+        <feature name="VonagePlugin">
+        	<param name="android-package" value="com.example.vonage.VonagePlugin" />
+        </feature>
+    </platform>
+    <platform name="ios">
+        <source-file src="src/ios/VonagePlugin.m" />
+        <framework src="OpenTok.framework" />
     </platform>
 </plugin>
