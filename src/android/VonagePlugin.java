@@ -9,6 +9,8 @@ import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
 import org.json.JSONArray;
 import org.json.JSONException;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 public class VonagePlugin extends CordovaPlugin {
     private Session session;
