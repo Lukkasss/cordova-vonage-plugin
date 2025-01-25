@@ -1,20 +1,10 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="cordova-plugin-vonage"
+        id="com.example.vonageplugin"
         version="1.0.0">
     <name>VonagePlugin</name>
-    <description>Plugin para integrar a Vonage Video API</description>
-    <js-module src="www/vonage.js" name="Vonage">
-        <clobbers target="Vonage" />
-    </js-module>
+    <description>Plugin para integração com Vonage Video API</description>
     <platform name="android">
-        <framework src="com.opentok.android:opentok-android-sdk:2.28.0" />
-        <source-file src="src/android/VonagePlugin.java" target-dir="src/com/example/vonage" />
-        <feature name="VonagePlugin">
-        	<param name="android-package" value="com.example.vonage.VonagePlugin" />
-        </feature>
-    </platform>
-    <platform name="ios">
-        <source-file src="src/ios/VonagePlugin.m" />
-        <framework src="OpenTok.framework" />
+	<framework src="com.opentok.android:opentok-android-sdk:2.25.0" />
+        <source-file src="src/android/VonagePlugin.java" target-dir="src/com/example/vonageplugin" />
     </platform>
 </plugin>
