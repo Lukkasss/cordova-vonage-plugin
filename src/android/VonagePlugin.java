@@ -60,12 +60,19 @@ public class VonagePlugin extends CordovaPlugin {
     actualWebView.evaluateJavascript(jsCode, value -> {
         if (value != null && !value.equals("null")) {
             try {
+                // Remover aspas extras da string retornada
+                String jsonString = value.trim();
+                if (jsonString.startsWith("\"") && jsonString.endsWith("\"")) {
+                    jsonString = jsonString.substring(1, jsonString.length() - 1)
+                                           .replace("\\\"", "\""); // Desescapar aspas internas
+                }
+
                 // Parse das dimensões retornadas pelo JavaScript
-                JSONObject rect = new JSONObject(value);
-                int left = rect.getInt("left");
-                int top = rect.getInt("top");
-                int width = rect.getInt("width");
-                int height = rect.getInt("height");
+                JSONObject rect = new JSONObject(jsonString);
+                int left = (int) rect.getDouble("left");
+                int top = (int) rect.getDouble("top");
+                int width = (int) rect.getDouble("width");
+                int height = (int) rect.getDouble("height");
 
                 Log.d("VonagePlugin", "Dimensões do contêiner: left=" + left + ", top=" + top + ", width=" + width + ", height=" + height);
 
@@ -96,6 +103,7 @@ public class VonagePlugin extends CordovaPlugin {
         }
     });
 });
+
 
 
 
