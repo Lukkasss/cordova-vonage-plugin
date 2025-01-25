@@ -41,7 +41,7 @@ public class VonagePlugin extends CordovaPlugin {
                 publisher = new Publisher.Builder(cordova.getActivity()).build();
 		// Renderizar o Publisher no elemento HTML especificado
 		cordova.getActivity().runOnUiThread(() -> {
-    // Código JavaScript para obter as dimensões e posição do elemento HTML
+    // Código JavaScript para verificar se o elemento HTML existe
     final String jsCode =
         "(function() {" +
         "   var container = document.getElementById('" + publisherElementId + "');" +
@@ -60,14 +60,13 @@ public class VonagePlugin extends CordovaPlugin {
     actualWebView.evaluateJavascript(jsCode, value -> {
         if (value != null && !value.equals("null")) {
             try {
-                // Remover aspas extras da string retornada
+                // Parse das dimensões retornadas pelo JavaScript
                 String jsonString = value.trim();
                 if (jsonString.startsWith("\"") && jsonString.endsWith("\"")) {
                     jsonString = jsonString.substring(1, jsonString.length() - 1)
                                            .replace("\\\"", "\""); // Desescapar aspas internas
                 }
 
-                // Parse das dimensões retornadas pelo JavaScript
                 JSONObject rect = new JSONObject(jsonString);
                 int left = (int) rect.getDouble("left");
                 int top = (int) rect.getDouble("top");
@@ -76,25 +75,18 @@ public class VonagePlugin extends CordovaPlugin {
 
                 Log.d("VonagePlugin", "Dimensões do contêiner: left=" + left + ", top=" + top + ", width=" + width + ", height=" + height);
 
-                // Criar um contêiner dinâmico no código nativo
-                FrameLayout publisherContainer = new FrameLayout(cordova.getActivity());
-                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
-                params.leftMargin = left;
-                params.topMargin = top;
+                // Configurar a View do Publisher com as dimensões do contêiner HTML
+                cordova.getActivity().runOnUiThread(() -> {
+                    publisher.getView().setLayoutParams(new FrameLayout.LayoutParams(
+                            width,
+                            height
+                    ));
 
-                // Configurar o contêiner com as dimensões e posição do elemento HTML
-                publisherContainer.setLayoutParams(params);
+                    // Adicionar a View do Publisher diretamente à WebView no local correto
+                    actualWebView.addView(publisher.getView());
 
-                // Adicionar a View do Publisher ao contêiner dinâmico
-                publisherContainer.addView(publisher.getView(), new FrameLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT
-                ));
-
-                // Adicionar o contêiner ao layout pai da WebView
-                ((FrameLayout) actualWebView.getParent()).addView(publisherContainer);
-
-                Log.d("VonagePlugin", "Publisher View adicionada ao container informado");
+                    Log.d("VonagePlugin", "Publisher View injetada no container existente");
+                });
             } catch (JSONException e) {
                 Log.e("VonagePlugin", "Erro ao processar as dimensões do contêiner: " + e.getMessage());
             }
@@ -103,6 +95,7 @@ public class VonagePlugin extends CordovaPlugin {
         }
     });
 });
+
 
 
 
