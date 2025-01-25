@@ -14,5 +14,15 @@
         	</feature>
     	</config-file>
         <source-file src="src/android/VonagePlugin.java" target-dir="src/com/example/vonage" />
+	<config-file target="AndroidManifest.xml" parent="/manifest">
+        	<uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+        	<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+        	<uses-permission android:name="android.permission.CAMERA" />
+        	<uses-permission android:name="android.permission.INTERNET" />
+        	<uses-permission android:name="android.permission.RECORD_AUDIO" />
+        	<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+        	<uses-permission android:name="android.permission.BLUETOOTH" />
+        	<uses-permission android:name="android.permission.BROADCAST_STICKY" />
+    	</config-file>
     </platform>
 </plugin>
