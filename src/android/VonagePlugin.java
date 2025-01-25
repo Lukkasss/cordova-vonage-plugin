@@ -39,12 +39,23 @@ public class VonagePlugin extends CordovaPlugin {
                 publisher = new Publisher.Builder(cordova.getActivity()).build();
 		// Renderizar o Publisher no elemento HTML especificado
 		cordova.getActivity().runOnUiThread(() -> {
-    FrameLayout rootLayout = (FrameLayout) cordova.getActivity().findViewById(android.R.id.content);
-    rootLayout.addView(publisher.getView(), new FrameLayout.LayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
-        ViewGroup.LayoutParams.MATCH_PARENT
-    ));
+    FrameLayout publisherContainer = cordova.getActivity().findViewById(
+        cordova.getActivity().getResources().getIdentifier(publisherElementId, "id", cordova.getActivity().getPackageName())
+    );
+
+    Log.d("VonagePlugin", "publisherContainer encontrado: " + (publisherContainer != null));
+
+    if (publisherContainer != null) {
+        publisherContainer.addView(publisher.getView(), new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+        ));
+        Log.d("VonagePlugin", "Publisher View adicionada ao container");
+    } else {
+        Log.e("VonagePlugin", "Elemento HTML não encontrado ou inválido: " + publisherElementId);
+    }
 });
+
 
 
                 session.publish(publisher);
