@@ -39,22 +39,32 @@ public class VonagePlugin extends CordovaPlugin {
                 publisher = new Publisher.Builder(cordova.getActivity()).build();
 		// Renderizar o Publisher no elemento HTML especificado
 		cordova.getActivity().runOnUiThread(() -> {
-    FrameLayout publisherContainer = cordova.getActivity().findViewById(
-        cordova.getActivity().getResources().getIdentifier(publisherElementId, "id", cordova.getActivity().getPackageName())
+    // Use a WebView para localizar o elemento pelo ID
+    webView.getEngine().evaluateJavascript(
+        "(function() { return document.getElementById('" + publisherElementId + "'); })();",
+        value -> {
+            if (value != null && !value.equals("null")) {
+                Log.d("VonagePlugin", "Elemento encontrado na WebView: " + publisherElementId);
+
+                // Adicionar a View do Publisher ao contêiner
+                FrameLayout publisherContainer = new FrameLayout(cordova.getActivity());
+                publisherContainer.setLayoutParams(new FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                ));
+
+                // Adicionar Publisher View ao contêiner
+                publisherContainer.addView(publisher.getView());
+                ((FrameLayout) webView.getView()).addView(publisherContainer);
+
+                Log.d("VonagePlugin", "Publisher View adicionada ao container");
+            } else {
+                Log.e("VonagePlugin", "Elemento não encontrado na WebView: " + publisherElementId);
+            }
+        }
     );
-
-    Log.d("VonagePlugin", "publisherContainer encontrado: " + (publisherContainer != null));
-
-    if (publisherContainer != null) {
-        publisherContainer.addView(publisher.getView(), new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-        ));
-        Log.d("VonagePlugin", "Publisher View adicionada ao container");
-    } else {
-        Log.e("VonagePlugin", "Elemento HTML não encontrado ou inválido: " + publisherElementId);
-    }
 });
+
 
 
 
