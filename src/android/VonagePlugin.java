@@ -2,6 +2,7 @@ package com.example.vonage;
 
 import com.opentok.android.Session;
 import com.opentok.android.Publisher;
+import com.opentok.android.PublisherKit;
 import com.opentok.android.Subscriber;
 import com.opentok.android.OpentokError;
 import com.opentok.android.Stream;
@@ -40,65 +41,58 @@ public class VonagePlugin extends CordovaPlugin {
                 // Publicar stream de vídeo
                 publisher = new Publisher.Builder(cordova.getActivity()).build();
 		// Renderizar o Publisher no elemento HTML especificado
+		
 		cordova.getActivity().runOnUiThread(() -> {
-    // Código JavaScript para verificar se o elemento HTML existe
+    // Código JavaScript para localizar o elemento HTML e preparar o contêiner
     final String jsCode =
         "(function() {" +
         "   var container = document.getElementById('" + publisherElementId + "');" +
         "   if (container) {" +
-        "       var rect = container.getBoundingClientRect();" +
-        "       return JSON.stringify({" +
-        "           left: rect.left, top: rect.top, width: rect.width, height: rect.height" +
-        "       });" +
+        "       container.innerHTML = ''; " + // Limpa qualquer conteúdo existente na div
+        "       var videoElement = document.createElement('video');" +
+        "       videoElement.setAttribute('autoplay', 'true');" +
+        "       videoElement.setAttribute('playsinline', 'true');" +
+        "       videoElement.style.width = '100%';" +
+        "       videoElement.style.height = '100%';" +
+        "       container.appendChild(videoElement);" +
+        "       return 'success';" +
         "   } else {" +
-        "       return null;" +
+        "       return 'not found';" +
         "   }" +
         "})();";
 
-    // Executar o JavaScript na WebView para obter as dimensões do contêiner
+    // Executar o JavaScript na WebView
     WebView actualWebView = (WebView) webView.getEngine().getView();
     actualWebView.evaluateJavascript(jsCode, value -> {
-        if (value != null && !value.equals("null")) {
-            try {
-                // Parse das dimensões retornadas pelo JavaScript
-                String jsonString = value.trim();
-                if (jsonString.startsWith("\"") && jsonString.endsWith("\"")) {
-                    jsonString = jsonString.substring(1, jsonString.length() - 1)
-                                           .replace("\\\"", "\""); // Desescapar aspas internas
-                }
+        if ("\"success\"".equals(value)) {
+            Log.d("VonagePlugin", "Publisher injetado com sucesso na div: " + publisherElementId);
 
-                JSONObject rect = new JSONObject(jsonString);
-                int left = (int) rect.getDouble("left");
-                int top = (int) rect.getDouble("top");
-                int width = (int) rect.getDouble("width");
-                int height = (int) rect.getDouble("height");
+            // Associar o stream do Publisher ao elemento <video> criado
+            cordova.getActivity().runOnUiThread(() -> {
+                // Aqui você pode configurar a associação do stream ao <video>
+                publisher.setPublisherListener(new PublisherKit.PublisherListener() {
+                    @Override
+                    public void onStreamCreated(PublisherKit publisherKit, Stream stream) {
+                        Log.d("VonagePlugin", "Stream criado: associando ao elemento de vídeo.");
+                        // Configurar associação do stream ao vídeo (se necessário)
+                    }
 
-                Log.d("VonagePlugin", "Dimensões do contêiner: left=" + left + ", top=" + top + ", width=" + width + ", height=" + height);
+                    @Override
+                    public void onStreamDestroyed(PublisherKit publisherKit, Stream stream) {
+                        Log.d("VonagePlugin", "Stream destruído.");
+                    }
 
-                // Configurar a View do Publisher com as dimensões do contêiner HTML
-                cordova.getActivity().runOnUiThread(() -> {
-                    publisher.getView().setLayoutParams(new FrameLayout.LayoutParams(
-                            width,
-                            height
-                    ));
-
-                    // Adicionar a View do Publisher diretamente à WebView no local correto
-                    actualWebView.addView(publisher.getView());
-
-                    Log.d("VonagePlugin", "Publisher View injetada no container existente");
+                    @Override
+                    public void onError(PublisherKit publisherKit, OpentokError opentokError) {
+                        Log.e("VonagePlugin", "Erro no Publisher: " + opentokError.getMessage());
+                    }
                 });
-            } catch (JSONException e) {
-                Log.e("VonagePlugin", "Erro ao processar as dimensões do contêiner: " + e.getMessage());
-            }
+            });
         } else {
             Log.e("VonagePlugin", "Elemento não encontrado na WebView: " + publisherElementId);
         }
     });
 });
-
-
-
-
 
 
 
