@@ -5,6 +5,11 @@
     <description>Plugin para integração com Vonage Video API</description>
     <platform name="android">
 	<framework src="com.opentok.android:opentok-android-sdk:2.25.0" />
+	<config-file target="res/xml/config.xml" parent="/*">
+        	<feature name="VonagePlugin">
+            		<param name="android-package" value="com.example.vonageplugin.VonagePlugin" />
+        	</feature>
+    	</config-file>
         <source-file src="src/android/VonagePlugin.java" target-dir="src/com/example/vonageplugin" />
     </platform>
 </plugin>
