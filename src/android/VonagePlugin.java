@@ -6,9 +6,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import com.opentok.android.Session;
-import com.opentok.android.Publisher;
-import com.opentok.android.Subscriber;
+import com.opentok.android.Stream;
+import com.opentok.android.OpentokError;
 
+/**
+ * Cordova Plugin para integrar a Vonage Video API.
+ */
 public class VonagePlugin extends CordovaPlugin {
 
     private Session session;
@@ -26,8 +29,10 @@ public class VonagePlugin extends CordovaPlugin {
     }
 
     private void joinSession(String apiKey, String sessionId, String token, CallbackContext callbackContext) {
-        // Inicializar sessão
+        // Inicializa a sessão
         session = new Session.Builder(cordova.getActivity().getApplicationContext(), apiKey, sessionId).build();
+
+        // Define o listener para eventos da sessão
         session.setSessionListener(new Session.SessionListener() {
             @Override
             public void onConnected(Session session) {
@@ -40,10 +45,24 @@ public class VonagePlugin extends CordovaPlugin {
             }
 
             @Override
+            public void onStreamReceived(Session session, Stream stream) {
+                // Lógica opcional para lidar com streams recebidos
+                // Exemplo: Log.d("VonagePlugin", "Stream received: " + stream.getStreamId());
+            }
+
+            @Override
+            public void onStreamDropped(Session session, Stream stream) {
+                // Lógica opcional para lidar com streams encerrados
+                // Exemplo: Log.d("VonagePlugin", "Stream dropped: " + stream.getStreamId());
+            }
+
+            @Override
             public void onError(Session session, OpentokError opentokError) {
-                callbackContext.error(opentokError.getMessage());
+                callbackContext.error("Session error: " + opentokError.getMessage());
             }
         });
+
+        // Conecta-se à sessão usando o token fornecido
         session.connect(token);
     }
 }
