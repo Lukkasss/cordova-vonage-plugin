@@ -5,8 +5,7 @@
     </js-module>
     <platform name="android">
 	<framework src="com.opentok.android:opentok-android-sdk:2.28.0" />
-        <config-file target="AndroidManifest.xml" parent="/*">
-            <uses-permission android:name="android.permission.INTERNET" />
+        <config-file target="res/xml/config.xml" parent="/*">
             <feature name="VonagePlugin">
                 <param name="android-package" value="com.example.vonage.VonagePlugin" />
             </feature>
