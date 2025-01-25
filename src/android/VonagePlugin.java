@@ -20,20 +20,38 @@ public class VonagePlugin extends CordovaPlugin {
             String apiKey = args.getString(0);
             String sessionId = args.getString(1);
             String token = args.getString(2);
-            String subscriberElementId = args.getString(3); // ID do elemento para Subscriber
-            this.connectToSession(apiKey, sessionId, token, subscriberElementId, callbackContext);
+            String publisherElementId = args.getString(3); // ID do elemento para Subscriber
+            this.connectToSession(apiKey, sessionId, token, publisherElementId, callbackContext);
             return true;
         }
         return false;
     }
 
-    private void connectToSession(String apiKey, String sessionId, String token, String subscriberElementId, CallbackContext callbackContext) {
+    private void connectToSession(String apiKey, String sessionId, String token, String publisherElementId, CallbackContext callbackContext) {
         session = new Session.Builder(cordova.getActivity().getApplicationContext(), apiKey, sessionId).build();
         session.setSessionListener(new Session.SessionListener() {
             @Override
             public void onConnected(Session session) {
                 // Publicar stream de vídeo
                 publisher = new Publisher.Builder(cordova.getActivity()).build();
+		// Renderizar o Publisher no elemento HTML especificado
+                cordova.getActivity().runOnUiThread(() -> {
+                    int publisherViewId = cordova.getActivity().getResources().getIdentifier(publisherElementId, "id", cordova.getActivity().getPackageName());
+                    if (publisherViewId != 0) {
+                        FrameLayout publisherContainer = cordova.getActivity().findViewById(publisherViewId);
+                        if (publisherContainer != null) {
+                            // Adicionar a View do Publisher ao contêiner
+                            publisherContainer.addView(publisher.getView(), new FrameLayout.LayoutParams(
+                                    ViewGroup.LayoutParams.MATCH_PARENT,
+                                    ViewGroup.LayoutParams.MATCH_PARENT
+                            ));
+                        } else {
+                            callbackContext.error("Elemento HTML não encontrado: " + publisherElementId);
+                        }
+                    } else {
+                        callbackContext.error("ID inválido para o elemento HTML: " + publisherElementId);
+                    }
+                });
                 session.publish(publisher);
                 callbackContext.success("Connected to session");
             }
