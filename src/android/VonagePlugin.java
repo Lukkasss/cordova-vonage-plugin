@@ -43,56 +43,33 @@ public class VonagePlugin extends CordovaPlugin {
 		// Renderizar o Publisher no elemento HTML especificado
 		
 		cordova.getActivity().runOnUiThread(() -> {
-    // Código JavaScript para localizar o elemento HTML e preparar o contêiner
-    final String jsCode =
-        "(function() {" +
-        "   var container = document.getElementById('" + publisherElementId + "');" +
-        "   if (container) {" +
-        "       container.innerHTML = ''; " + // Limpa qualquer conteúdo existente na div
-        "       var videoElement = document.createElement('video');" +
-        "       videoElement.setAttribute('autoplay', 'true');" +
-        "       videoElement.setAttribute('playsinline', 'true');" +
-        "       videoElement.style.width = '100%';" +
-        "       videoElement.style.height = '100%';" +
-        "       container.appendChild(videoElement);" +
-        "       return 'success';" +
-        "   } else {" +
-        "       return 'not found';" +
-        "   }" +
-        "})();";
+    // Criar um contêiner dinâmico para o Publisher
+    FrameLayout publisherContainer = new FrameLayout(cordova.getActivity());
 
-    // Executar o JavaScript na WebView
-    WebView actualWebView = (WebView) webView.getEngine().getView();
-    actualWebView.evaluateJavascript(jsCode, value -> {
-        if ("\"success\"".equals(value)) {
-            Log.d("VonagePlugin", "Publisher injetado com sucesso na div: " + publisherElementId);
+    // Configurar as dimensões da View
+    int width = (int) (150 * cordova.getActivity().getResources().getDisplayMetrics().density); // 150px em dp
+    int height = (int) (300 * cordova.getActivity().getResources().getDisplayMetrics().density); // 300px em dp
 
-            // Associar o stream do Publisher ao elemento <video> criado
-            cordova.getActivity().runOnUiThread(() -> {
-                // Aqui você pode configurar a associação do stream ao <video>
-                publisher.setPublisherListener(new PublisherKit.PublisherListener() {
-                    @Override
-                    public void onStreamCreated(PublisherKit publisherKit, Stream stream) {
-                        Log.d("VonagePlugin", "Stream criado: associando ao elemento de vídeo.");
-                        // Configurar associação do stream ao vídeo (se necessário)
-                    }
+    FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
+    params.rightMargin = 0; // Alinhar à borda direita
+    params.bottomMargin = 0; // Alinhar à borda inferior
+    params.gravity = android.view.Gravity.BOTTOM | android.view.Gravity.END; // Canto inferior direito
 
-                    @Override
-                    public void onStreamDestroyed(PublisherKit publisherKit, Stream stream) {
-                        Log.d("VonagePlugin", "Stream destruído.");
-                    }
+    publisherContainer.setLayoutParams(params);
 
-                    @Override
-                    public void onError(PublisherKit publisherKit, OpentokError opentokError) {
-                        Log.e("VonagePlugin", "Erro no Publisher: " + opentokError.getMessage());
-                    }
-                });
-            });
-        } else {
-            Log.e("VonagePlugin", "Elemento não encontrado na WebView: " + publisherElementId);
-        }
-    });
+    // Adicionar a View do Publisher ao contêiner
+    publisherContainer.addView(publisher.getView(), new FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+    ));
+
+    // Adicionar o contêiner ao layout pai da WebView
+    FrameLayout rootLayout = (FrameLayout) cordova.getActivity().findViewById(android.R.id.content);
+    rootLayout.addView(publisherContainer);
+
+    Log.d("VonagePlugin", "Publisher View adicionada no canto inferior direito.");
 });
+
 
 
 
