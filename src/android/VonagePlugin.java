@@ -20,13 +20,14 @@ public class VonagePlugin extends CordovaPlugin {
             String apiKey = args.getString(0);
             String sessionId = args.getString(1);
             String token = args.getString(2);
-            this.connectToSession(apiKey, sessionId, token, callbackContext);
+            String subscriberElementId = args.getString(3); // ID do elemento para Subscriber
+            this.connectToSession(apiKey, sessionId, token, subscriberElementId, callbackContext);
             return true;
         }
         return false;
     }
 
-    private void connectToSession(String apiKey, String sessionId, String token, CallbackContext callbackContext) {
+    private void connectToSession(String apiKey, String sessionId, String token, String subscriberElementId, CallbackContext callbackContext) {
         session = new Session.Builder(cordova.getActivity().getApplicationContext(), apiKey, sessionId).build();
         session.setSessionListener(new Session.SessionListener() {
             @Override
@@ -44,7 +45,16 @@ public class VonagePlugin extends CordovaPlugin {
 
             @Override
             public void onStreamReceived(Session session, Stream stream) {
-                // Gerenciar quando um novo stream é recebido
+                // Cria o Subscriber e associa ao elemento HTML pelo ID
+                Subscriber subscriber = new Subscriber.Builder(cordova.getActivity(), stream).build();
+                cordova.getActivity().runOnUiThread(() -> {
+                    int subscriberViewId = cordova.getActivity().getResources().getIdentifier(subscriberElementId, "id", cordova.getActivity().getPackageName());
+                    if (subscriberViewId != 0) {
+                        cordova.getActivity().findViewById(subscriberViewId).setVisibility(android.view.View.VISIBLE);
+                        ((android.widget.FrameLayout) cordova.getActivity().findViewById(subscriberViewId)).addView(subscriber.getView());
+                    }
+                });
+                session.subscribe(subscriber);
             }
 
             @Override
