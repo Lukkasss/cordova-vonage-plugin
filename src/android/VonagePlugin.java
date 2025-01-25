@@ -5,64 +5,42 @@ import org.apache.cordova.CallbackContext;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import com.opentok.android.Session;
-import com.opentok.android.Stream;
-import com.opentok.android.OpentokError;
+import com.opentok.OpenTok;
+import com.opentok.Session;
+import com.opentok.exception.OpenTokException;
 
 /**
- * Cordova Plugin para integrar a Vonage Video API.
+ * Plugin Cordova para gerar Session ID usando o SDK da Vonage.
  */
 public class VonagePlugin extends CordovaPlugin {
 
-    private Session session;
-
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        if (action.equals("joinSession")) {
+        if (action.equals("generateSessionId")) {
             String apiKey = args.getString(0);
-            String sessionId = args.getString(1);
-            String token = args.getString(2);
-            this.joinSession(apiKey, sessionId, token, callbackContext);
+            String apiSecret = args.getString(1);
+            this.generateSessionId(apiKey, apiSecret, callbackContext);
             return true;
         }
         return false;
     }
 
-    private void joinSession(String apiKey, String sessionId, String token, CallbackContext callbackContext) {
-        // Inicializa a sessão
-        session = new Session.Builder(cordova.getActivity().getApplicationContext(), apiKey, sessionId).build();
+    private void generateSessionId(String apiKey, String apiSecret, CallbackContext callbackContext) {
+        try {
+            // Inicializa o cliente OpenTok
+            OpenTok opentok = new OpenTok(apiKey, apiSecret);
 
-        // Define o listener para eventos da sessão
-        session.setSessionListener(new Session.SessionListener() {
-            @Override
-            public void onConnected(Session session) {
-                callbackContext.success("Connected to session");
-            }
+            // Cria uma nova sessão
+            Session session = opentok.createSession();
 
-            @Override
-            public void onDisconnected(Session session) {
-                callbackContext.error("Disconnected from session");
-            }
+            // Obtém o Session ID gerado
+            String sessionId = session.getSessionId();
 
-            @Override
-            public void onStreamReceived(Session session, Stream stream) {
-                // Lógica opcional para lidar com streams recebidos
-                // Exemplo: Log.d("VonagePlugin", "Stream received: " + stream.getStreamId());
-            }
-
-            @Override
-            public void onStreamDropped(Session session, Stream stream) {
-                // Lógica opcional para lidar com streams encerrados
-                // Exemplo: Log.d("VonagePlugin", "Stream dropped: " + stream.getStreamId());
-            }
-
-            @Override
-            public void onError(Session session, OpentokError opentokError) {
-                callbackContext.error("Session error: " + opentokError.getMessage());
-            }
-        });
-
-        // Conecta-se à sessão usando o token fornecido
-        session.connect(token);
+            // Retorna o Session ID ao JavaScript
+            callbackContext.success(sessionId);
+        } catch (OpenTokException e) {
+            // Retorna erro ao JavaScript em caso de falha
+            callbackContext.error("Erro ao gerar Session ID: " + e.getMessage());
+        }
     }
 }
