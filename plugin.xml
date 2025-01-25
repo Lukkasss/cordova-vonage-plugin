@@ -1,34 +1,16 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="com.example.vonage"
+        id="com.example.createSession"
         version="1.0.0">
     <name>VonagePlugin</name>
-    <description>Cordova plugin to interact with Vonage Video API</description>
-    <license>Apache 2.0</license>
-
-    <!-- JavaScript Module -->
     <js-module src="www/VonagePlugin.js" name="VonagePlugin">
         <clobbers target="window.VonagePlugin" />
     </js-module>
-
-    <!-- Android Platform Configuration -->
     <platform name="android">
-        <!-- OpenTok SDK Dependency -->
-        <framework src="com.opentok.android:opentok-android-sdk:2.25.3" />
-
-        <!-- Source File -->
-        <source-file src="src/android/VonagePlugin.java" target-dir="src/com/example/vonage" />
-
-        <!-- Gradle Repository Configuration -->
-        <config-file target="build.gradle" parent="allprojects/repositories">
-            <repository>
-                maven { url 'https://maven.pkg.github.com/opentok/opentok-android-sdk' }
-            </repository>
-        </config-file>
-
-        <!-- Plugin Registration in config.xml -->
-        <config-file target="res/xml/config.xml" parent="/*">
+	<framework src="com.opentok.android:opentok-android-sdk:2.25.3" />
+        <source-file src="src/android/VonagePlugin.java" target-dir="src/com/example/createSession" />
+	<config-file target="res/xml/config.xml" parent="/*">
             <feature name="VonagePlugin">
-                <param name="android-package" value="com.example.vonage.VonagePlugin" />
+                <param name="android-package" value="com.example.createSession.VonagePlugin" />
             </feature>
         </config-file>
     </platform>
