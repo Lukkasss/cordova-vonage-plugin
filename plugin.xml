@@ -1,22 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="cordova-plugin-vonage"
-        version="1.0.0">
+<plugin id="cordova-plugin-vonage" version="1.0.0" xmlns="http://apache.org/cordova/ns/plugins" xmlns:android="http://schemas.android.com/apk/res/android">
     <name>VonagePlugin</name>
-    <description>Plugin Cordova para integração com a Vonage Video API</description>
-    <license>Apache 2.0</license>
-    <keywords>cordova,plugin,vonage,video</keywords>
-
-    <js-module src="www/cordova-plugin-vonage.js" name="Vonage">
-        <clobbers target="window.Vonage" />
+    <js-module src="www/VonagePlugin.js" name="VonagePlugin">
+        <clobbers target="window.VonagePlugin" />
     </js-module>
     <platform name="android">
-        <framework src="com.opentok.android:opentok-android-sdk:2.28.0" />
-        <source-file src="src/android/VonagePlugin.java" target-dir="src/com/example/vonage" />
-	<config-file target="config.xml" parent="/*">
+	<framework src="com.opentok.android:opentok-android-sdk:2.28.0" />
+        <config-file target="AndroidManifest.xml" parent="/*">
+            <uses-permission android:name="android.permission.INTERNET" />
             <feature name="VonagePlugin">
                 <param name="android-package" value="com.example.vonage.VonagePlugin" />
             </feature>
         </config-file>
+        <source-file src="src/android/VonagePlugin.java" target-dir="src/com/example/vonage" />
     </platform>
 </plugin>
