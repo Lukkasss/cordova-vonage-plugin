@@ -3,6 +3,10 @@ import com.opentok.android.Publisher;
 import com.opentok.android.Subscriber;
 import com.opentok.android.OpentokError;
 import com.opentok.android.Stream;
+import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.CallbackContext;
+import org.json.JSONArray;
+import org.json.JSONException;
 
 public class VonagePlugin extends CordovaPlugin {
     private Session session;
