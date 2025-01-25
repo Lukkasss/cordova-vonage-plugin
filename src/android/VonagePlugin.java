@@ -39,21 +39,13 @@ public class VonagePlugin extends CordovaPlugin {
                 publisher = new Publisher.Builder(cordova.getActivity()).build();
 		// Renderizar o Publisher no elemento HTML especificado
 		cordova.getActivity().runOnUiThread(() -> {
-    FrameLayout publisherContainer = cordova.getActivity().findViewById(
-        cordova.getActivity().getResources().getIdentifier(publisherElementId, "id", cordova.getActivity().getPackageName())
-    );
-
-    if (publisherContainer != null) {
-        // Adicionar a View do Publisher ao contêiner
-        publisherContainer.addView(publisher.getView(), new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-        ));
-    } else {
-        Log.e("VonagePlugin", "Elemento HTML não encontrado: " + publisherElementId);
-        callbackContext.error("Elemento HTML não encontrado: " + publisherElementId);
-    }
+    FrameLayout rootLayout = (FrameLayout) cordova.getActivity().findViewById(android.R.id.content);
+    rootLayout.addView(publisher.getView(), new FrameLayout.LayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.MATCH_PARENT
+    ));
 });
+
 
                 session.publish(publisher);
                 callbackContext.success("Connected to session");
