@@ -38,25 +38,23 @@ public class VonagePlugin extends CordovaPlugin {
                 // Publicar stream de vídeo
                 publisher = new Publisher.Builder(cordova.getActivity()).build();
 		// Renderizar o Publisher no elemento HTML especificado
-                cordova.getActivity().runOnUiThread(() -> {
-                    int publisherViewId = cordova.getActivity().getResources().getIdentifier(publisherElementId, "id", cordova.getActivity().getPackageName());
-		    Log.d("VonagePlugin", "PublisherViewId: " + publisherViewId);			
-                    if (publisherViewId != 0) {
-                        FrameLayout publisherContainer = cordova.getActivity().findViewById(publisherViewId);
-			Log.d("VonagePlugin", "publisherContainer: " + publisherContainer);
-                        if (publisherContainer != null) {
-                            // Adicionar a View do Publisher ao contêiner
-                            publisherContainer.addView(publisher.getView(), new FrameLayout.LayoutParams(
-                                    ViewGroup.LayoutParams.MATCH_PARENT,
-                                    ViewGroup.LayoutParams.MATCH_PARENT
-                            ));
-                        } else {
-                            callbackContext.error("Elemento HTML não encontrado: " + publisherElementId);
-                        }
-                    } else {
-                        callbackContext.error("ID inválido para o elemento HTML: " + publisherElementId);
-                    }
-                });
+		cordova.getActivity().runOnUiThread(() -> {
+    FrameLayout publisherContainer = cordova.getActivity().findViewById(
+        cordova.getActivity().getResources().getIdentifier(publisherElementId, "id", cordova.getActivity().getPackageName())
+    );
+
+    if (publisherContainer != null) {
+        // Adicionar a View do Publisher ao contêiner
+        publisherContainer.addView(publisher.getView(), new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+        ));
+    } else {
+        Log.e("VonagePlugin", "Elemento HTML não encontrado: " + publisherElementId);
+        callbackContext.error("Elemento HTML não encontrado: " + publisherElementId);
+    }
+});
+
                 session.publish(publisher);
                 callbackContext.success("Connected to session");
             }
