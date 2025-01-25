@@ -40,31 +40,36 @@ public class VonagePlugin extends CordovaPlugin {
                 publisher = new Publisher.Builder(cordova.getActivity()).build();
 		// Renderizar o Publisher no elemento HTML especificado
 		cordova.getActivity().runOnUiThread(() -> {
-    // Use a WebView para localizar o elemento pelo ID
-    webView.getEngine().evaluateJavascript(
-        "(function() { return document.getElementById('" + publisherElementId + "'); })();",
-        value -> {
-            if (value != null && !value.equals("null")) {
-                Log.d("VonagePlugin", "Elemento encontrado na WebView: " + publisherElementId);
+    // Código JavaScript para localizar o elemento HTML
+    final String jsCode = "document.getElementById('" + publisherElementId + "') !== null";
 
-                // Adicionar a View do Publisher ao contêiner
-                FrameLayout publisherContainer = new FrameLayout(cordova.getActivity());
-                publisherContainer.setLayoutParams(new FrameLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT
-                ));
+    // Executar o JavaScript na WebView para verificar se o elemento existe
+    WebView actualWebView = (WebView) webView.getEngine().getView();
+    actualWebView.evaluateJavascript(jsCode, value -> {
+        if ("true".equals(value)) {
+            Log.d("VonagePlugin", "Elemento encontrado na WebView: " + publisherElementId);
 
-                // Adicionar Publisher View ao contêiner
-                publisherContainer.addView(publisher.getView());
-                ((FrameLayout) webView.getView()).addView(publisherContainer);
+            // Criar um contêiner dinâmico no código nativo
+            FrameLayout publisherContainer = new FrameLayout(cordova.getActivity());
+            publisherContainer.setLayoutParams(new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+            ));
 
-                Log.d("VonagePlugin", "Publisher View adicionada ao container");
-            } else {
-                Log.e("VonagePlugin", "Elemento não encontrado na WebView: " + publisherElementId);
-            }
+            // Adicionar a View do Publisher ao contêiner dinâmico
+            publisherContainer.addView(publisher.getView());
+
+            // Adicionar o contêiner ao layout pai da WebView
+            FrameLayout rootLayout = (FrameLayout) cordova.getActivity().findViewById(android.R.id.content);
+            rootLayout.addView(publisherContainer);
+
+            Log.d("VonagePlugin", "Publisher View adicionada ao container");
+        } else {
+            Log.e("VonagePlugin", "Elemento não encontrado na WebView: " + publisherElementId);
         }
-    );
+    });
 });
+
 
 
 
