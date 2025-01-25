@@ -1,8 +1,8 @@
 var exec = require('cordova/exec');
 
 var VonagePlugin = {
-    generateSessionId: function(apiKey, apiSecret, successCallback, errorCallback) {
-        exec(successCallback, errorCallback, "VonagePlugin", "generateSessionId", [apiKey, apiSecret]);
+    createSession: function(successCallback, errorCallback) {
+        exec(successCallback, errorCallback, "VonagePlugin", "createSession", []);
     }
 };
 
