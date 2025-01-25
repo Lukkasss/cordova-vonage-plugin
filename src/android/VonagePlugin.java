@@ -65,16 +65,7 @@ public class VonagePlugin extends CordovaPlugin {
 
             @Override
             public void onStreamReceived(Session session, Stream stream) {
-                // Cria o Subscriber e associa ao elemento HTML pelo ID
-                Subscriber subscriber = new Subscriber.Builder(cordova.getActivity(), stream).build();
-                cordova.getActivity().runOnUiThread(() -> {
-                    int subscriberViewId = cordova.getActivity().getResources().getIdentifier(subscriberElementId, "id", cordova.getActivity().getPackageName());
-                    if (subscriberViewId != 0) {
-                        cordova.getActivity().findViewById(subscriberViewId).setVisibility(android.view.View.VISIBLE);
-                        ((android.widget.FrameLayout) cordova.getActivity().findViewById(subscriberViewId)).addView(subscriber.getView());
-                    }
-                });
-                session.subscribe(subscriber);
+
             }
 
             @Override
