@@ -12,6 +12,7 @@ import org.json.JSONException;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.util.Log;
+import android.webkit.WebView;
 
 public class VonagePlugin extends CordovaPlugin {
     private Session session;
