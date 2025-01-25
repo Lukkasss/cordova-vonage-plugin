@@ -11,6 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.util.Log;
 
 public class VonagePlugin extends CordovaPlugin {
     private Session session;
@@ -39,8 +40,10 @@ public class VonagePlugin extends CordovaPlugin {
 		// Renderizar o Publisher no elemento HTML especificado
                 cordova.getActivity().runOnUiThread(() -> {
                     int publisherViewId = cordova.getActivity().getResources().getIdentifier(publisherElementId, "id", cordova.getActivity().getPackageName());
+		    Log.d("VonagePlugin", "PublisherViewId: " + publisherViewId);			
                     if (publisherViewId != 0) {
                         FrameLayout publisherContainer = cordova.getActivity().findViewById(publisherViewId);
+			Log.d("VonagePlugin", "publisherContainer: " + publisherContainer);
                         if (publisherContainer != null) {
                             // Adicionar a View do Publisher ao contêiner
                             publisherContainer.addView(publisher.getView(), new FrameLayout.LayoutParams(
