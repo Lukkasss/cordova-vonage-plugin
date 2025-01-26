@@ -92,7 +92,7 @@ public void onStreamReceived(Session session, Stream stream) {
         FrameLayout subscriberContainer = new FrameLayout(cordova.getActivity());
 
         // Configurar as dimensões da View
-        int width = (int) (150 * cordova.getActivity().getResources().getDisplayMetrics().density); // 150px em dp
+        int width = (int) (200 * cordova.getActivity().getResources().getDisplayMetrics().density); // 150px em dp
         int height = (int) (300 * cordova.getActivity().getResources().getDisplayMetrics().density); // 300px em dp
 
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
@@ -102,6 +102,7 @@ public void onStreamReceived(Session session, Stream stream) {
 
         // Criar o Subscriber e adicionar sua View ao contêiner
         Subscriber subscriber = new Subscriber.Builder(cordova.getActivity(), stream).build();
+	subscriber.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FILL);
         subscriberContainer.addView(subscriber.getView(), new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
