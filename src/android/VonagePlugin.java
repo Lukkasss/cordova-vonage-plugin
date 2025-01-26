@@ -4,6 +4,7 @@ import com.opentok.android.Session;
 import com.opentok.android.Publisher;
 import com.opentok.android.PublisherKit;
 import com.opentok.android.Subscriber;
+import com.opentok.android.BaseVideoRenderer;
 import com.opentok.android.OpentokError;
 import com.opentok.android.Stream;
 import org.apache.cordova.CordovaPlugin;
