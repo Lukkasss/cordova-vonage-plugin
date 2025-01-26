@@ -83,10 +83,41 @@ public class VonagePlugin extends CordovaPlugin {
                 callbackContext.error("Disconnected from session");
             }
 
-            @Override
-            public void onStreamReceived(Session session, Stream stream) {
+@Override
+public void onStreamReceived(Session session, Stream stream) {
+    Log.d("VonagePlugin", "Stream recebido: criando Subscriber.");
 
-            }
+    cordova.getActivity().runOnUiThread(() -> {
+        // Criar um contêiner dinâmico para o Subscriber
+        FrameLayout subscriberContainer = new FrameLayout(cordova.getActivity());
+
+        // Configurar as dimensões da View
+        int width = (int) (150 * cordova.getActivity().getResources().getDisplayMetrics().density); // 150px em dp
+        int height = (int) (300 * cordova.getActivity().getResources().getDisplayMetrics().density); // 300px em dp
+
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
+        params.gravity = android.view.Gravity.CENTER; // Centralizar na tela
+
+        subscriberContainer.setLayoutParams(params);
+
+        // Criar o Subscriber e adicionar sua View ao contêiner
+        Subscriber subscriber = new Subscriber.Builder(cordova.getActivity(), stream).build();
+        subscriberContainer.addView(subscriber.getView(), new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+        ));
+
+        // Adicionar o contêiner ao layout pai da WebView
+        FrameLayout rootLayout = (FrameLayout) cordova.getActivity().findViewById(android.R.id.content);
+        rootLayout.addView(subscriberContainer);
+
+        Log.d("VonagePlugin", "Subscriber View adicionada no meio da tela.");
+
+        // Inscrever o Subscriber na sessão
+        session.subscribe(subscriber);
+    });
+}
+
 
             @Override
             public void onStreamDropped(Session session, Stream stream) {
